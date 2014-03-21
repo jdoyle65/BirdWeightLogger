@@ -1,0 +1,7 @@
+/bin
+.classpath
+commons*
+opencsv*
+phidget*
+.project
+.settings
