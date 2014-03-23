@@ -13,9 +13,9 @@ public class ConfigParser {
 	private int[] bridge_serials;
 	private int[] rfid_serials;
 	
-	public ConfigParser() throws FileNotFoundException, IOException {
+	public ConfigParser(String fileName) throws FileNotFoundException, IOException {
 		props = new Properties();
-		props.load(new FileInputStream(new File("config.cfg")));
+		props.load(new FileInputStream(new File(fileName)));
 		getProperties();
 	}
 	

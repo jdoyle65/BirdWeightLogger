@@ -17,7 +17,7 @@ public class ConfigParserTest {
 	@Before
 	public void setUp() {
 		try {
-			cfg = new ConfigParser();
+			cfg = new ConfigParser("test.cfg");
 			assertNotNull(cfg);
 		} catch (FileNotFoundException e) {
 			fail("File not found.");
@@ -34,7 +34,7 @@ public class ConfigParserTest {
 	@Test
 	public void testConfigParser() {
 		try {
-			cfg = new ConfigParser();
+			cfg = new ConfigParser("test.cfg");
 			assertNotNull(cfg);
 		} catch (FileNotFoundException e) {
 			fail("File not found.");

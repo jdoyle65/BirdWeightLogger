@@ -12,7 +12,7 @@ public class BirdWeightLogger {
 	private RFIDPhidget[] rfids;
 	
 	public BirdWeightLogger(String[] args) throws FileNotFoundException, IOException {
-		config = new ConfigParser();
+		config = new ConfigParser("config.cfg");
 		initOptions();
 	}
 	
