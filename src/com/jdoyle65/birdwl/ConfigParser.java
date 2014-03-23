@@ -40,12 +40,16 @@ public class ConfigParser {
 	}
 	
 	public int getRfidBridge(int serial) {
-		int i = rfid_map.get(serial);
+		Integer i = rfid_map.get(serial);
+		if(i == null)
+			return -1;
 		return rfid_pairings[i].getBridge();
 	}
 	
 	public int getRfidLoadCell(int serial) {
-		int i = rfid_map.get(serial);
+		Integer i = rfid_map.get(serial);
+		if(i == null)
+			return -1;
 		return rfid_pairings[i].getLoadCell();
 	}
 	

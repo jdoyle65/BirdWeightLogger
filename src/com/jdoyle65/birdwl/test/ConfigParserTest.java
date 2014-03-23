@@ -95,5 +95,21 @@ public class ConfigParserTest {
 			assertTrue(true);
 		}
 	}
+	
+	@Test
+	public void testGetRfidBridge() {
+		int b = cfg.getRfidBridge(3322);
+		assertEquals(0, b);
+		b = cfg.getRfidBridge(00);
+		assertEquals(-1, b);
+	}
+	
+	@Test
+	public void testGetRfidLoadCell() {
+		int b = cfg.getRfidLoadCell(3322);
+		assertEquals(0, b);
+		b = cfg.getRfidLoadCell(00);
+		assertEquals(-1, b);
+	}
 
 }
