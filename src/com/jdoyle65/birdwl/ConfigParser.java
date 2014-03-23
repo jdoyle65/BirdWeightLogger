@@ -13,6 +13,7 @@ public class ConfigParser {
 	private int rfid_readers;
 	private int[] bridge_serials;
 	private int[] rfid_serials;
+	private int data_rate;
 	private BridgePair[] rfid_pairings;
 	private HashMap<Integer, Integer> rfid_map;
 	private HashMap<Integer, Integer> bridge_map;
@@ -53,6 +54,10 @@ public class ConfigParser {
 		return rfid_pairings[i].getLoadCell();
 	}
 	
+	public int getDataRate() {
+		return data_rate;
+	}
+	
 	private void getProperties() {
 		bridges = Integer.parseInt(props.getProperty("bridges", "0"));
 		rfid_readers = Integer.parseInt(props.getProperty("rfid_readers", "0"));
@@ -61,6 +66,7 @@ public class ConfigParser {
 		rfid_pairings = new BridgePair[rfid_readers];
 		rfid_map = new HashMap<Integer, Integer>(rfid_readers);
 		bridge_map = new HashMap<Integer, Integer>(bridges);
+		data_rate = Integer.parseInt(props.getProperty("data_rate", "500"));
 		
 		for(int i = 0; i < bridges; i++) {
 			bridge_serials[i] = Integer.parseInt(
