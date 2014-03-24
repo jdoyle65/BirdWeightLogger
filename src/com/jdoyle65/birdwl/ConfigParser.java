@@ -58,6 +58,16 @@ public class ConfigParser {
 		return data_rate;
 	}
 	
+	public double getLoadCellOffset(int bridge, int input) {
+		String offset = props.getProperty("offset_" + bridge + "_" + input, "0");
+		return Double.parseDouble(offset);
+	}
+	
+	public double getLoadCellKValue(int bridge, int input) {
+		String k = props.getProperty("k_" + bridge + "_" + input, "1");
+		return Double.parseDouble(k);
+	}
+	
 	private void getProperties() {
 		bridges = Integer.parseInt(props.getProperty("bridges", "0"));
 		rfid_readers = Integer.parseInt(props.getProperty("rfid_readers", "0"));

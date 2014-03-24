@@ -146,20 +146,24 @@ public class BirdWeightLogger {
 					int myBridgeIndex = config.getRfidBridge(mySerial);
 					BridgePhidget myBridge = bridges.get(config.getBridgeSerial(myBridgeIndex));
 					int myLoadCell = config.getRfidLoadCell(mySerial);
+					double myOffset = config.getLoadCellOffset(myBridgeIndex, myLoadCell);
+					double myK = config.getLoadCellKValue(myBridgeIndex, myLoadCell);
 
-					double last_data = myBridge.getBridgeValue(myLoadCell);
+					double last_data = myK * (myBridge.getBridgeValue(myLoadCell) + myOffset);
 					while(myRfid.getTagStatus())
 					{
-						double data = myBridge.getBridgeValue(myLoadCell);
+						double data = myK * (myBridge.getBridgeValue(myLoadCell) + myOffset);
 						if(data != last_data)
-							System.out.println("Data: " + data);
+							System.out.print("Data: " + data + "\r");
 						last_data = data;
 						dateString = df.format(Calendar.getInstance().getTime());
 						dl.logRow(dateString, myTag, data);
 						Thread.sleep(DATA_RATE);
 					}
 
+					System.out.println("\nWriting...");
 					dl.writeFile();
+					System.out.println("Success!");
 					dl.close();
 					
 				} catch (PhidgetException e) {
