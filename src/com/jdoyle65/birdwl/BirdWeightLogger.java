@@ -84,10 +84,10 @@ public class BirdWeightLogger {
 						try {
 							System.out.println("Bridge attached: " 
 									+ ae.getSource().getDeviceLabel() + ", S/N: "
-									+ ae.getSource().getDeviceID());
+									+ ae.getSource().getSerialNumber());
 							BridgePhidget b = (BridgePhidget)ae.getSource();
 							b.setDataRate(DATA_RATE);
-							b.setGain(0, BridgePhidget.PHIDGET_BRIDGE_GAIN_128);
+							b.setGain(0, BridgePhidget.PHIDGET_BRIDGE_GAIN_64);
 							b.setEnabled(0, true);
 						}
 						catch (PhidgetException e) {
@@ -116,7 +116,7 @@ public class BirdWeightLogger {
 							RFIDPhidget r = (RFIDPhidget)ae.getSource();
 							System.out.println("RFID attached: " 
 									+ ae.getSource().getDeviceLabel() + ", S/N: "
-									+ ae.getSource().getDeviceID());
+									+ ae.getSource().getSerialNumber());
 							r.setAntennaOn(true);
 							r.setLEDOn(true);
 						} catch (PhidgetException e) {

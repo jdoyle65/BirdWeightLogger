@@ -13,7 +13,11 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 * 
+* Many thanks to OpenCSV for providing the libraries used in this class for
+* writing out data into CSV format. (OpenCSV is also licensed under Apache
+* License, Version 2.0).
 * 
+* You can find OpenCSV's webpage here: http://opencsv.sourceforge.net/
 */
 
 package com.jdoyle65.birdwl;
