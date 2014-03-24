@@ -1,3 +1,21 @@
+/*
+ * Copyright 2014 Justin Doyle
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * 
+ * 
+ */
+
 package com.jdoyle65.birdwl;
 
 import java.io.FileNotFoundException;
@@ -18,7 +36,14 @@ import com.phidgets.event.TagGainListener;
 import com.phidgets.event.TagLossEvent;
 import com.phidgets.event.TagLossListener;
 
+/**
+ * Program used to operate multiple paired RFID readers and Load Cells for
+ * automated, hands free weighing of birds.
+ * @author Justin Doyle
+ *
+ */
 public class BirdWeightLogger {
+	/*** PRIVATE VARIABLES ***/
 	private static ConfigParser config;
 	private HashMap<Integer, BridgePhidget> bridges;
 	private HashMap<Integer, RFIDPhidget> rfids;
@@ -27,14 +52,23 @@ public class BirdWeightLogger {
 	public static final int WAIT_FOR_ATT = 1000*10;
 	public final int DATA_RATE;
 
-	public BirdWeightLogger(String[] args) throws FileNotFoundException, IOException {
+	/**
+	 * Default constructor.
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	public BirdWeightLogger() throws FileNotFoundException, IOException {
 		config = new ConfigParser("config.cfg");
 		DATA_RATE = config.getDataRate();
 		initOptions();
 	}
 
 
-	/**** PRIVATE METHODS ****/
+	/************************************
+	 *  
+	 * PRIVATE METHODS
+	 * 
+	 ************************************/
 	private void initOptions() {
 		bridges = new HashMap<Integer, BridgePhidget>(config.getNumBridges());
 		rfids = new HashMap<Integer, RFIDPhidget>(config.getNumRfidReaders());
@@ -47,9 +81,11 @@ public class BirdWeightLogger {
 				tempB.addAttachListener(new AttachListener() {
 					@Override
 					public void attached(AttachEvent ae) {
-						System.out.println("Bridge attached");
-						BridgePhidget b = (BridgePhidget)ae.getSource();
 						try {
+							System.out.println("Bridge attached: " 
+									+ ae.getSource().getDeviceLabel() + ", S/N: "
+									+ ae.getSource().getDeviceID());
+							BridgePhidget b = (BridgePhidget)ae.getSource();
 							b.setDataRate(DATA_RATE);
 							b.setGain(0, BridgePhidget.PHIDGET_BRIDGE_GAIN_128);
 							b.setEnabled(0, true);
@@ -76,9 +112,11 @@ public class BirdWeightLogger {
 				tempR.addAttachListener(new AttachListener() {
 					@Override
 					public void attached(AttachEvent ae) {
-						RFIDPhidget r = (RFIDPhidget)ae.getSource();
 						try {
-							System.out.println("RFID attached!");
+							RFIDPhidget r = (RFIDPhidget)ae.getSource();
+							System.out.println("RFID attached: " 
+									+ ae.getSource().getDeviceLabel() + ", S/N: "
+									+ ae.getSource().getDeviceID());
 							r.setAntennaOn(true);
 							r.setLEDOn(true);
 						} catch (PhidgetException e) {
@@ -94,16 +132,32 @@ public class BirdWeightLogger {
 			}
 		}
 
+		// Main thread loop
 		while(true) {
-			// TODO This loop is just for dev purposes
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
 
-	/*** PRIVATE LISTENER CLASSES ***/
+	/************************************
+	 *  
+	 * PRIVATE CLASSES
+	 * 
+	 ************************************/
+	
+	/**
+	 * Primary class for Tag Gain events.
+	 * @author Justin Doyle
+	 *
+	 */
 	private class RfidTagGainerListener implements TagGainListener {
 		private RFIDPhidget myRfid;
 		private Boolean myFlag;
+		
 		public RfidTagGainerListener(RFIDPhidget rfid, Boolean flag) {
 			myRfid = rfid;
 			myFlag = flag;
@@ -120,60 +174,68 @@ public class BirdWeightLogger {
 		}
 	}
 
-		private class GetData implements Runnable {
+	/**
+	 * Designed for getting load cell data on its own thread when RFID tag gain
+	 * event is triggered. Also saves data captured into a CSV file.
+	 * 
+	 * @author Justin Doyle
+	 *
+	 */
+	private class GetData implements Runnable {
 
+		private RFIDPhidget myRfid;
+		private String myTag;
 
-			private RFIDPhidget myRfid;
-			private String myTag;
-
-
-			public GetData(RFIDPhidget r, String tag) {
-				myRfid = r;
-				myTag = tag;
-			}
-
-
-			@Override
-			public void run() {
-				try {
-					DateFormat df = new SimpleDateFormat("yyyy-dd-MM HH:mm:ss");
-					Date date = Calendar.getInstance().getTime();
-					String dateString = df.format(date);
-					DataLogger dl = new DataLogger("log/" + df.format(date) + ".csv", myRfid.getDeviceLabel());
-
-
-					int mySerial = myRfid.getSerialNumber();
-					int myBridgeIndex = config.getRfidBridge(mySerial);
-					BridgePhidget myBridge = bridges.get(config.getBridgeSerial(myBridgeIndex));
-					int myLoadCell = config.getRfidLoadCell(mySerial);
-					double myOffset = config.getLoadCellOffset(myBridgeIndex, myLoadCell);
-					double myK = config.getLoadCellKValue(myBridgeIndex, myLoadCell);
-
-					double last_data = myK * (myBridge.getBridgeValue(myLoadCell) + myOffset);
-					while(myRfid.getTagStatus())
-					{
-						double data = myK * (myBridge.getBridgeValue(myLoadCell) + myOffset);
-						if(data != last_data)
-							System.out.print("Data: " + data + "\r");
-						last_data = data;
-						dateString = df.format(Calendar.getInstance().getTime());
-						dl.logRow(dateString, myTag, data);
-						Thread.sleep(DATA_RATE);
-					}
-
-					System.out.println("\nWriting...");
-					dl.writeFile();
-					System.out.println("Success!");
-					dl.close();
-					
-				} catch (PhidgetException e) {
-					e.printStackTrace();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-
+		public GetData(RFIDPhidget r, String tag) {
+			myRfid = r;
+			myTag = tag;
 		}
+
+		@Override
+		public void run() {
+			try {
+				// Set up info needed for logging data in CSV file
+				DateFormat df = new SimpleDateFormat("yyyy-dd-MM_HH:mm:ss");
+				Date date = Calendar.getInstance().getTime();
+				String dateString = df.format(date);
+				DataLogger dl = new DataLogger("log/" 
+						+ myRfid.getDeviceLabel().toUpperCase() + "_"
+						+ df.format(date) 
+						+ ".csv", myRfid.getDeviceLabel());
+
+				// Get all info pertaining to bridges and load cells
+				int mySerial = myRfid.getSerialNumber();
+				int myBridgeIndex = config.getRfidBridge(mySerial);
+				int myLoadCell = config.getRfidLoadCell(mySerial);
+				double myOffset = config.getLoadCellOffset(myBridgeIndex, myLoadCell);
+				double myK = config.getLoadCellKValue(myBridgeIndex, myLoadCell);
+				BridgePhidget myBridge = bridges.get(config.getBridgeSerial(myBridgeIndex));
+
+				// Start grabbing data from the load cell
+				double last_data = myK * (myBridge.getBridgeValue(myLoadCell) + myOffset);
+				while(myRfid.getTagStatus())
+				{
+					double data = myK * (myBridge.getBridgeValue(myLoadCell) + myOffset);
+					if(data != last_data)
+						System.out.print("Data: " + data + "\r");
+					last_data = data;
+					dl.logRow(dateString, myTag, data);
+					Thread.sleep(DATA_RATE);
+				}
+
+				System.out.println("\nWriting...");
+				dl.writeFile();
+				System.out.println("Success!");
+				dl.close();
+
+			} catch (PhidgetException e) {
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
 	}
+}
