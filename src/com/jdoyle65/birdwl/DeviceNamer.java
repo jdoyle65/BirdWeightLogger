@@ -61,6 +61,7 @@ public class DeviceNamer {
 
 			} catch (PhidgetException e) {
 				e.printStackTrace();
+				phidget.close();
 			}
 		}
 	}
