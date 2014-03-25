@@ -76,6 +76,12 @@ public class ConfigParserTest {
 	public void testGetRfidSerialFail() {
 		try {
 			cfg.getRfidSerial(1);
+			fail("Rfid array should have been out of bounds");
+		}
+		catch (ArrayIndexOutOfBoundsException e) {
+			assertTrue(true);
+		}
+		try {
 			cfg.getRfidSerial(-1);
 			fail("Rfid array should have been out of bounds");
 		}
@@ -83,11 +89,26 @@ public class ConfigParserTest {
 			assertTrue(true);
 		}
 	}
+	
+	@Test
+	public void testGetBridgeSerialPass() {
+		try {
+			assertEquals(2211, cfg.getBridgeSerial(0));
+		} catch (ArrayIndexOutOfBoundsException e) {
+			fail("Bridge serial should not have been out of bounds.");
+		}
+	}
 
 	@Test
-	public void testGetBridgeSerial() {
+	public void testGetBridgeSerialFail() {
 		try {
 			cfg.getBridgeSerial(1);
+			fail("Bridge array should have been out of bounds");
+		}
+		catch (ArrayIndexOutOfBoundsException e) {
+			assertTrue(true);
+		}
+		try {
 			cfg.getBridgeSerial(-1);
 			fail("Bridge array should have been out of bounds");
 		}
@@ -110,6 +131,23 @@ public class ConfigParserTest {
 		assertEquals(0, b);
 		b = cfg.getRfidLoadCell(00);
 		assertEquals(-1, b);
+	}
+	
+	@Test 
+	public void testGetDataRate() {
+		assertEquals(100, cfg.getDataRate());
+	}
+	
+	@Test
+	public void testGetLoadCellOffset() {
+		double offset = cfg.getLoadCellOffset(0, 0);
+		assertEquals("Load Cell offset okay.", 0, offset, 0.01);
+	}
+	
+	@Test
+	public void testGetLoadCellKValue() {
+		double k = cfg.getLoadCellKValue(0, 0);
+		assertEquals("Load Cell K value okay.", 1, k, 0.01);
 	}
 
 }
