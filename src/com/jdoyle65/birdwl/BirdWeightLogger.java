@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Scanner;
 
 import com.phidgets.BridgePhidget;
 import com.phidgets.PhidgetException;
@@ -49,7 +50,7 @@ public class BirdWeightLogger {
 	private HashMap<Integer, RFIDPhidget> rfids;
 
 	/*** PUBLIC FINALS ***/
-	public static final int WAIT_FOR_ATT = 1000*10;
+	public static final int WAIT_FOR_ATT = 1000*5;
 	public final int DATA_RATE;
 
 	/**
@@ -70,6 +71,7 @@ public class BirdWeightLogger {
 	 * 
 	 ************************************/
 	private void initOptions() {
+		System.out.println("Starting Bird Weight Logger...");
 		bridges = new HashMap<Integer, BridgePhidget>(config.getNumBridges());
 		rfids = new HashMap<Integer, RFIDPhidget>(config.getNumRfidReaders());
 
@@ -133,12 +135,11 @@ public class BirdWeightLogger {
 		}
 
 		// Main thread loop
+		Scanner s = new Scanner(System.in);
 		while(true) {
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			String c = s.next();
+			if(c.equals("q"))
+				break;
 		}
 	}
 
