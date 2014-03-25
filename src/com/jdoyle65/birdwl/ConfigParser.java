@@ -36,6 +36,7 @@ public class ConfigParser {
 	private int rfid_readers;
 	private int[] bridge_serials;
 	private int[] rfid_serials;
+	private int timeout;
 	private int data_rate;
 	private BridgePair[] rfid_pairings;
 	private HashMap<Integer, Integer> rfid_map;
@@ -127,6 +128,15 @@ public class ConfigParser {
 	}
 	
 	/**
+	 * Get the time in seconds at which the program will wait for a
+	 * Phidget to be attached.
+	 * @return The time in seconds.
+	 */
+	public int getTimeout() {
+		return timeout;
+	}
+	
+	/**
 	 * Get the rate in milliseconds at which to capture Bridge data.
 	 * @return The rate in milliseconds.
 	 */
@@ -164,6 +174,7 @@ public class ConfigParser {
 		rfid_pairings = new BridgePair[rfid_readers];
 		rfid_map = new HashMap<Integer, Integer>(rfid_readers);
 		bridge_map = new HashMap<Integer, Integer>(bridges);
+		timeout = Integer.parseInt(props.getProperty("timeout", "5"));
 		data_rate = Integer.parseInt(props.getProperty("data_rate", "500"));
 		
 		// Get all the bridges and their associated indexes.

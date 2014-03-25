@@ -93,6 +93,11 @@ public class ConfigParserTest {
 		b = cfg.getRfidLoadCell(00);
 		assertEquals(-1, b);
 	}
+	
+	@Test
+	public void testGetTimout() {
+		assertEquals(5, cfg.getTimeout());
+	}
 
 	@Test 
 	public void testGetDataRate() {
