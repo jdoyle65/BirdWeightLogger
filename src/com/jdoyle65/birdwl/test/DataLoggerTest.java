@@ -29,26 +29,17 @@ public class DataLoggerTest {
 	}
 
 	@Test
-	public void testDataLoggerStringString() {
-		try {
-			log = new DataLogger("log/test.csv", "1");
-		} catch (IOException e) {
-			fail("DataLoggerStringString not expected to have IOException");
-		}
+	public void testDataLoggerStringString() throws IOException {
+		log = new DataLogger("log/test.csv", "1");
 	}
 
 	@Test
-	public void testDataLoggerStringInt() {
-		try {
-			log = new DataLogger("log/test.csv", 1);
-		} catch (IOException e) {
-			fail("DataLoggerStringInt not expected to have IOException");
-		}
+	public void testDataLoggerStringInt() throws IOException {
+		log = new DataLogger("log/test.csv", 1);
 	}
 
 	@Test
-	public void testLogRow() {
-		try {
+	public void testLogRow() throws IOException {
 			log.logRow("Now", "11", 22.0);
 			log.writeFile();
 			log.close();
@@ -59,9 +50,6 @@ public class DataLoggerTest {
 			assertEquals("11", in[1]);
 			assertEquals("Double value okay.", 22.0, doub, 0.01);
 			read.close();
-		} catch (IOException e) {
-			fail("logRow had IOException");
-		}
 	}
 
 }
