@@ -49,6 +49,9 @@ public class DataLogger {
 		deviceId = Integer.toString(devId);
 		file = new FileWriter(fileName);
 		writer = new CSVWriter(file);
+		dates = new ArrayList<>(100);
+		tagIds = new ArrayList<>(100);
+		weightData = new ArrayList<>(100);
 	}
 
 	public void logRow(String date, String tagId, double weight) {
