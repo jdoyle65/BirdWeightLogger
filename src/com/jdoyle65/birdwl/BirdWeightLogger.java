@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Scanner;
 
 import com.phidgets.BridgePhidget;
 import com.phidgets.PhidgetException;
@@ -51,6 +52,10 @@ public class BirdWeightLogger {
 	/*** PUBLIC FINALS ***/
 	public static final int WAIT_FOR_ATT = 1000*10;
 	public final int DATA_RATE;
+	
+	/*** PUBLIC STATICS ***/
+	public static double TARE = 0.0;
+	public static double POSSIBLE_TARE = 0.0;
 
 	/**
 	 * Default constructor.
@@ -87,7 +92,7 @@ public class BirdWeightLogger {
 									+ ae.getSource().getSerialNumber());
 							BridgePhidget b = (BridgePhidget)ae.getSource();
 							b.setDataRate(DATA_RATE);
-							b.setGain(0, BridgePhidget.PHIDGET_BRIDGE_GAIN_64);
+							b.setGain(0, BridgePhidget.PHIDGET_BRIDGE_GAIN_32);
 							b.setEnabled(0, true);
 						}
 						catch (PhidgetException e) {
@@ -133,11 +138,20 @@ public class BirdWeightLogger {
 		}
 
 		// Main thread loop
+		Scanner s = new Scanner(System.in);
 		while(true) {
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+			char option = s.next().charAt(0);
+			switch(option)
+			{
+			case 'q':
+				System.exit(0);
+				break;
+			case 't':
+				TARE = POSSIBLE_TARE;
+				break;
+			default:
+				System.out.println("Invalid command.");
+				break;
 			}
 		}
 	}
@@ -212,12 +226,20 @@ public class BirdWeightLogger {
 				BridgePhidget myBridge = bridges.get(config.getBridgeSerial(myBridgeIndex));
 
 				// Start grabbing data from the load cell
-				double last_data = myK * (myBridge.getBridgeValue(myLoadCell) + myOffset);
+				double last_data = myK * (myBridge.getBridgeValue(myLoadCell) + myOffset) - TARE;
+				//int i_last_data = (int)(last_data * 10);
+				//last_data = i_last_data / 10.0;
 				while(myRfid.getTagStatus())
 				{
-					double data = myK * (myBridge.getBridgeValue(myLoadCell) + myOffset);
+					POSSIBLE_TARE = myK * (myBridge.getBridgeValue(myLoadCell) + myOffset);
+					double data = myK * (myBridge.getBridgeValue(myLoadCell) + myOffset) - TARE;
+					//int i_data = (int)(data * 10);
+					//data = i_data / 10.0;
 					if(data != last_data)
+					{
+						System.out.print("                                       \r");
 						System.out.print("Data: " + data + "\r");
+					}
 					last_data = data;
 					dl.logRow(dateString, myTag, data);
 					Thread.sleep(DATA_RATE);
