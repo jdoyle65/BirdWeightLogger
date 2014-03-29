@@ -54,6 +54,7 @@ public class BirdWeightLogger {
 	public final int DATA_RATE;
 	
 	/*** PUBLIC STATICS ***/
+	// TODO Tares are only temporary. Need to set up individual load cell taring.
 	public static double TARE = 0.0;
 	public static double POSSIBLE_TARE = 0.0;
 

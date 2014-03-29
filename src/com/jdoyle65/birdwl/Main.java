@@ -29,7 +29,6 @@ public class Main {
 			System.out.println("Configuation file not found");
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
