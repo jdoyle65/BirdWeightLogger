@@ -50,7 +50,7 @@ public class BirdWeightLogger {
 	private HashMap<Integer, RFIDPhidget> rfids;
 
 	/*** PUBLIC FINALS ***/
-	public static final int WAIT_FOR_ATT = 1000*10;
+	public final int WAIT_FOR_ATT;
 	public final int DATA_RATE;
 	
 	/*** PUBLIC STATICS ***/
@@ -64,6 +64,7 @@ public class BirdWeightLogger {
 	 */
 	public BirdWeightLogger() throws FileNotFoundException, IOException {
 		config = new ConfigParser("config.cfg");
+		WAIT_FOR_ATT = config.getTimeout() * 1000;
 		DATA_RATE = config.getDataRate();
 		initOptions();
 	}
@@ -75,6 +76,7 @@ public class BirdWeightLogger {
 	 * 
 	 ************************************/
 	private void initOptions() {
+		System.out.println("Starting Bird Weight Logger...");
 		bridges = new HashMap<Integer, BridgePhidget>(config.getNumBridges());
 		rfids = new HashMap<Integer, RFIDPhidget>(config.getNumRfidReaders());
 
