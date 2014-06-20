@@ -32,6 +32,10 @@ import com.phidgets.PhidgetException;
 import com.phidgets.RFIDPhidget;
 import com.phidgets.event.AttachEvent;
 import com.phidgets.event.AttachListener;
+import com.phidgets.event.BridgeDataEvent;
+import com.phidgets.event.BridgeDataListener;
+import com.phidgets.event.DetachEvent;
+import com.phidgets.event.DetachListener;
 import com.phidgets.event.TagGainEvent;
 import com.phidgets.event.TagGainListener;
 import com.phidgets.event.TagLossEvent;
@@ -52,11 +56,14 @@ public class BirdWeightLogger {
 	/*** PUBLIC FINALS ***/
 	public final int WAIT_FOR_ATT;
 	public final int DATA_RATE;
-	
+
 	/*** PUBLIC STATICS ***/
 	// TODO Tares are only temporary. Need to set up individual load cell taring.
-	public static double TARE = 0.0;
-	public static double POSSIBLE_TARE = 0.0;
+	public static double TARE_0 = 0.0;
+	public static double TARE_1 = 0.0;
+	public static double POSSIBLE_TARE_0 = 0.0;
+	public static double POSSIBLE_TARE_1 = 0.0;
+
 
 	/**
 	 * Default constructor.
@@ -97,10 +104,50 @@ public class BirdWeightLogger {
 							b.setDataRate(DATA_RATE);
 							b.setGain(0, BridgePhidget.PHIDGET_BRIDGE_GAIN_32);
 							b.setEnabled(0, true);
+							b.setGain(1, BridgePhidget.PHIDGET_BRIDGE_GAIN_32);
+							b.setEnabled(1, true);
+
 						}
 						catch (PhidgetException e) {
 							e.printStackTrace();
 						}
+					}
+				});
+				tempB.addBridgeDataListener(new BridgeDataListener() {
+					
+					@Override
+					public void bridgeData(BridgeDataEvent arg0) {
+						BridgePhidget b = (BridgePhidget)arg0.getSource();
+						try {
+
+							double data_0;
+							double data_1;
+							double k_0 = config.getLoadCellKValue(0, 0);
+							double k_1 = config.getLoadCellKValue(0, 1);
+							double offset_0 = config.getLoadCellOffset(0, 0);
+							double offset_1 = config.getLoadCellOffset(0, 1);
+
+							POSSIBLE_TARE_0 = k_0 * (b.getBridgeValue(0) + offset_0);
+							data_0 = k_0 * (b.getBridgeValue(0) + offset_0) - TARE_0;
+
+							POSSIBLE_TARE_1 = k_1 * (b.getBridgeValue(1) + offset_1);
+							data_1 = k_1 * (b.getBridgeValue(1) + offset_1) - TARE_1;
+
+							int i_data_0 = (int)(data_0 * 10);
+							int i_data_1 = (int)(data_1 * 10);
+							data_0 = i_data_0 / 10.0;
+							data_1 = i_data_1 / 10.0;
+							
+							String rfid0 = rfids.get(config.getRfidSerials()[1]).getDeviceLabel();
+							String rfid1 = rfids.get(config.getRfidSerials()[0]).getDeviceLabel();
+
+							System.out.print("                                       \r");
+							System.out.print(rfid0 + ": " + data_0 + "\t" + rfid1 + ":" + data_1 + "\r");
+							//Thread.sleep(500);
+						} catch (PhidgetException e) {
+							e.printStackTrace();
+						}
+						
 					}
 				});
 				tempB.waitForAttachment(WAIT_FOR_ATT);
@@ -117,6 +164,19 @@ public class BirdWeightLogger {
 				Boolean tempFlag = new Boolean(false);
 				tempR.open(config.getRfidSerial(i));
 				tempR.addTagGainListener(new RfidTagGainerListener(tempR, tempFlag));
+				tempR.addDetachListener(new DetachListener() {
+
+					@Override
+					public void detached(DetachEvent arg0) {
+						RFIDPhidget r = (RFIDPhidget)arg0.getSource();
+						try {
+							System.out.println("Detached: " + r.getDeviceLabel());
+						} catch (PhidgetException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				});
 				tempR.addAttachListener(new AttachListener() {
 					@Override
 					public void attached(AttachEvent ae) {
@@ -149,8 +209,11 @@ public class BirdWeightLogger {
 			case 'q':
 				System.exit(0);
 				break;
-			case 't':
-				TARE = POSSIBLE_TARE;
+			case '0':
+				TARE_0 = POSSIBLE_TARE_0;
+				break;
+			case '1':
+				TARE_1 = POSSIBLE_TARE_1;
 				break;
 			default:
 				System.out.println("Invalid command.");
@@ -165,7 +228,7 @@ public class BirdWeightLogger {
 	 * PRIVATE CLASSES
 	 * 
 	 ************************************/
-	
+
 	/**
 	 * Primary class for Tag Gain events.
 	 * @author Justin Doyle
@@ -174,7 +237,7 @@ public class BirdWeightLogger {
 	private class RfidTagGainerListener implements TagGainListener {
 		private RFIDPhidget myRfid;
 		private Boolean myFlag;
-		
+
 		public RfidTagGainerListener(RFIDPhidget rfid, Boolean flag) {
 			myRfid = rfid;
 			myFlag = flag;
@@ -229,20 +292,29 @@ public class BirdWeightLogger {
 				BridgePhidget myBridge = bridges.get(config.getBridgeSerial(myBridgeIndex));
 
 				// Start grabbing data from the load cell
-				double last_data = myK * (myBridge.getBridgeValue(myLoadCell) + myOffset) - TARE;
-				//int i_last_data = (int)(last_data * 10);
-				//last_data = i_last_data / 10.0;
+				double last_data = myK * (myBridge.getBridgeValue(myLoadCell) + myOffset) - (myLoadCell == 0 ? TARE_0 : TARE_1);
+				int i_last_data = (int)(last_data * 10);
+				last_data = i_last_data / 10.0;
 				while(myRfid.getTagStatus())
 				{
-					POSSIBLE_TARE = myK * (myBridge.getBridgeValue(myLoadCell) + myOffset);
-					double data = myK * (myBridge.getBridgeValue(myLoadCell) + myOffset) - TARE;
-					//int i_data = (int)(data * 10);
-					//data = i_data / 10.0;
-					if(data != last_data)
+					double data;
+					if(myLoadCell == 0)
 					{
-						System.out.print("                                       \r");
-						System.out.print("Data: " + data + "\r");
+						POSSIBLE_TARE_0 = myK * (myBridge.getBridgeValue(myLoadCell) + myOffset);
+						data = myK * (myBridge.getBridgeValue(myLoadCell) + myOffset) - TARE_0;
 					}
+					else
+					{
+						POSSIBLE_TARE_1 = myK * (myBridge.getBridgeValue(myLoadCell) + myOffset);
+						data = myK * (myBridge.getBridgeValue(myLoadCell) + myOffset) - TARE_1;
+					}
+					int i_data = (int)(data * 10);
+					data = i_data / 10.0;
+					//if(data != last_data)
+					//{
+					//System.out.print("                                       \r");
+					//System.out.print(myRfid.getDeviceLabel() + ": " + data + "\r");
+					//}
 					last_data = data;
 					dl.logRow(dateString, myTag, data);
 					Thread.sleep(DATA_RATE);
