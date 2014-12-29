@@ -11,6 +11,11 @@ public class Calibrator {
 	private static BridgePhidget bridge;
 	
 	public static void main(String[] args) {
+		if(args.length != 2) {
+			System.out.print("Incorrect arguments. Example usage: 'java -jar Calibrator.jar x y'\n"
+					+ "where x is Phidget Bridge serial number and y is the index number of the load cell");
+			System.exit(-1);
+		}
 		sn = Integer.parseInt(args[0]);
 		index = Integer.parseInt(args[1]);
 		

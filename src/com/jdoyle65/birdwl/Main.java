@@ -26,7 +26,7 @@ public class Main {
 		try {
 			BirdWeightLogger bwl = new BirdWeightLogger();
 		} catch (FileNotFoundException e) {
-			System.out.println("Configuation file not found");
+			System.out.println("Configuration file not found");
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();

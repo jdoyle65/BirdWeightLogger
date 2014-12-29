@@ -8,3 +8,5 @@ phidget*
 .settings
 .idea/
 BWL.iml
+out/
+src/META-INF/
