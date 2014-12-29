@@ -67,8 +67,8 @@ public class BirdWeightLogger {
 
 	/**
 	 * Default constructor.
-	 * @throws FileNotFoundException
-	 * @throws IOException
+	 * @throws java.io.FileNotFoundException
+	 * @throws java.io.IOException
 	 */
 	public BirdWeightLogger() throws FileNotFoundException, IOException {
 		config = new ConfigParser("config.cfg");

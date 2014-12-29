@@ -45,8 +45,8 @@ public class ConfigParser {
 	/**
 	 * Default constructor.
 	 * @param fileName The configuration file name.
-	 * @throws FileNotFoundException
-	 * @throws IOException
+	 * @throws java.io.FileNotFoundException
+	 * @throws java.io.IOException
 	 */
 	public ConfigParser(String fileName) throws FileNotFoundException, IOException {
 		props = new Properties();
