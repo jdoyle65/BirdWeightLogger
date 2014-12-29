@@ -6,3 +6,5 @@ opencsv*
 phidget*
 .project
 .settings
+.idea/
+BWL.iml
