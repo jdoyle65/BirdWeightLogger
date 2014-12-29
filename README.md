@@ -33,6 +33,7 @@ We decided to use the Raspberry Pi Model B because of its cheap price, low power
   * offset_0_0 - The offset value to give to load cell 0-0 (Offset values explained below in Calibration section). The first 0 is the bridge index, the second 0 is load cell index on that bridge.
   * k_0_0 - The K value to give to load cell 0-0 (K values explained below in Calibration section). The first 0 is the bridge index, the second 0 is load cell index on that bridge.
 5. Using your preferred command line tool, navigate to the directory BWL.jar and config.cfg are located in. Run the command "java -jar BWL.jar". You will most likely have to run the jar as Administrator/root, as the Phidget USB drivers require it to work properly.
+6. Once the program is running, you can enter '0' to zero load cell 0, or '1' to zero load cell 1. You can also enter 'q' to quit the program at any time. As of this time we only included support for two load cells per bridge.
 
 
 ## Calibration
@@ -53,3 +54,4 @@ I recommend using several known weights within the weight range of the animals y
 
 ## Running the Program
 
+Since we ran our software on the Raspberry Pi Model B with Raspbian installed, we were able to use a relatively simple setup. Our Raspberry Pis were connected to a network so we could simply ssh into each one. Once logged in we used the Linux tool [screen](http://linux.die.net/man/1/screen) to keep the session running once we were ready to logout and disconnect from the Pi, which allowed us to resume that session the next time we logged into the Pi. If running the software on another operating system, you may have to explore options the work best for you.

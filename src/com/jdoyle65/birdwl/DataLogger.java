@@ -28,6 +28,9 @@ import java.util.ArrayList;
 
 import au.com.bytecode.opencsv.*;
 
+/**
+ * DataLogger is a class that takes care of logging all data input to CSV files.
+ */
 public class DataLogger {
 	private FileWriter file;
 	private CSVWriter writer;
@@ -36,6 +39,11 @@ public class DataLogger {
 	private ArrayList<String> tagIds;
 	private ArrayList<Double> weightData;
 
+	/**
+	 * @param fileName Name of csv file to create.
+	 * @param devId ID number of device logging data.
+	 * @throws IOException
+	 */
 	public DataLogger(String fileName, String devId) throws IOException {
 		deviceId = devId;
 		file = new FileWriter(fileName);
@@ -45,6 +53,11 @@ public class DataLogger {
 		weightData = new ArrayList<>(100);
 	}
 
+	/**
+	 * @param fileName Name of csv file to create.
+	 * @param devId ID number of device logging data.
+	 * @throws IOException
+	 */
 	public DataLogger(String fileName, int devId) throws IOException {
 		deviceId = Integer.toString(devId);
 		file = new FileWriter(fileName);
@@ -54,12 +67,21 @@ public class DataLogger {
 		weightData = new ArrayList<>(100);
 	}
 
+	/**
+	 * Log a row in the data entry table. 
+	 * @param date Current date.
+	 * @param tagId Alpha-numeric tag number.
+	 * @param weight Weight data captured.
+	 */
 	public void logRow(String date, String tagId, double weight) {
 		dates.add(date);
 		tagIds.add(tagId);
 		weightData.add(weight);
 	}
-	
+
+	/**
+	 * Write out rows to file. 
+	 */
 	public void writeFile() {
 		for(int i = 0; i < dates.size(); i++)
 		{
@@ -70,7 +92,11 @@ public class DataLogger {
 			writer.writeNext(row);
 		}
 	}
-	
+
+	/**
+	 * Close file.
+	 * @throws IOException
+	 */
 	public void close() throws IOException {
 		writer.close();
 	}

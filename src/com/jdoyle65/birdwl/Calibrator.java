@@ -33,8 +33,6 @@ public class Calibrator {
 								+ ae.getSource().getSerialNumber());
 						BridgePhidget b = (BridgePhidget)ae.getSource();
 						b.setDataRate(500);
-						//b.setGain(0, BridgePhidget.PHIDGET_BRIDGE_GAIN_8);
-						//b.setEnabled(0, true);
 						b.setGain(index, BridgePhidget.PHIDGET_BRIDGE_GAIN_32);
 						b.setEnabled(index, true);
 						Thread.sleep(1000);
@@ -43,7 +41,6 @@ public class Calibrator {
 					catch (PhidgetException e) {
 						e.printStackTrace();
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
@@ -53,7 +50,6 @@ public class Calibrator {
 			
 			while (true) {
 				if(bridge.isAttached() && bridge.getEnabled(index)) {
-					//System.out.print("                                       \r");
 					double value = bridge.getBridgeValue(index);
 					System.out.println(value);
 					Thread.sleep(500);
